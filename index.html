@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMind AI — Smart Planner & Productivity Dashboard</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dark-theme">
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <img src="logo.png" alt="TaskMind AI Logo" class="app-logo-img">
+                <div class="logo-text">
+                    <h2>TaskMind AI</h2>
+                    <span class="logo-subtitle">Smart Planner</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-view="dashboard">
+                    <i class="fa-solid fa-table-cells"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-view="calendar">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Calendar</span>
+                </button>
+                <button class="nav-item" data-view="tasks">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>To-Do List</span>
+                </button>
+                <button class="nav-item" data-view="goals">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Goals & Streaks</span>
+                </button>
+                <button class="nav-item" data-view="notes">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    <span>Daily Diary</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User Avatar" class="avatar">
+                    <div class="user-info">
+                        <span class="user-name">Student User</span>
+                        <span class="user-role">Student & User</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">Dashboard Overview</h1>
+                    <p class="current-date-display" id="current-date-text"></p>
+                </div>
+
+                <div class="header-right">
+                    <button class="icon-btn" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+                    <button class="btn btn-primary" id="open-quick-add-btn">
+                        <i class="fa-solid fa-plus"></i> Add Item
+                    </button>
+                </div>
+            </header>
+
+            <section class="ai-input-section">
+                <div class="ai-input-card">
+                    <div class="ai-badge">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant
+                    </div>
+                    <form id="ai-schedule-form" class="ai-form">
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-comment-dots input-icon"></i>
+                            <input type="text" id="ai-prompt-input"
+                                placeholder="e.g. 'Physics Exam next Tuesday at 10 AM' or 'Study React tomorrow at 5 PM'"
+                                autocomplete="off" required>
+                            <button type="submit" class="btn btn-gradient" id="ai-submit-btn">
+                                <span class="btn-text">Schedule with AI</span>
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="preset-prompts">
+                        <span class="preset-label">Quick suggestions:</span>
+                        <button class="preset-chip" data-prompt="Math Midterm Exam next Thursday at 9 AM">
+                            <i class="fa-solid fa-graduation-cap"></i> Exam next Thursday 9 AM
+                        </button>
+                        <button class="preset-chip" data-prompt="Remind me to buy groceries tomorrow at 5 PM">
+                            <i class="fa-solid fa-cart-shopping"></i> Groceries tomorrow 5 PM
+                        </button>
+                        <button class="preset-chip" data-prompt="Daily workout schedule at 7 AM every day">
+                            <i class="fa-solid fa-dumbbell"></i> Daily Workout 7 AM
+                        </button>
+                        <button class="preset-chip" data-prompt="Goal: Read 10 books this month">
+                            <i class="fa-solid fa-target"></i> Goal: Read 10 books
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-dashboard" class="content-view active">
+                <div class="dashboard-grid">
+                    <div class="dash-card hero-card">
+                        <div class="hero-content">
+                            <div class="hero-tag"><i class="fa-solid fa-bolt"></i> Productivity Hub</div>
+                            <h2>Welcome back! 👋</h2>
+                            <p>Here is your daily schedule breakdown. You have <strong id="today-task-count">0
+                                    items</strong> scheduled for today.</p>
+
+                            <div class="hero-stats">
+                                <div class="stat-box">
+                                    <div class="stat-number" id="stat-completed-today">0</div>
+                                    <div class="stat-label">Done Today</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-number" id="stat-pending">0</div>
+                                    <div class="stat-label">Pending</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-number" id="stat-streak">0 🔥</div>
+                                    <div class="stat-label">Day Streak</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-number" id="stat-upcoming-exams">0</div>
+                                    <div class="stat-label">Upcoming Exams</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dash-card reminders-card">
+                        <div class="card-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-clock-rotate-left color-primary"></i>
+                                <h3>Today's Schedule</h3>
+                            </div>
+                            <span class="badge badge-accent" id="reminders-date-badge">Today</span>
+                        </div>
+                        <div class="reminders-list" id="today-reminders-container"></div>
+                    </div>
+
+                    <div class="dash-card todo-widget-card">
+                        <div class="card-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-square-check color-success"></i>
+                                <h3>Quick Tasks</h3>
+                            </div>
+                            <button class="btn btn-text btn-sm" id="view-all-tasks-btn">View All →</button>
+                        </div>
+                        <div class="todo-widget-list" id="dashboard-todo-container"></div>
+                    </div>
+
+                    <div class="dash-card goals-widget-card">
+                        <div class="card-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-award color-warning"></i>
+                                <h3>Active Goals</h3>
+                            </div>
+                        </div>
+                        <div class="goals-widget-content" id="dashboard-goals-container"></div>
+                    </div>
+
+                    <div class="dash-card note-widget-card">
+                        <div class="card-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-pen-to-square color-info"></i>
+                                <h3>Daily Diary</h3>
+                            </div>
+                            <span class="save-status-tag" id="quick-note-saved-tag">Saved</span>
+                        </div>
+                        <textarea id="quick-daily-note"
+                            placeholder="Write down your thoughts, exam formulas, or notes for today..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-calendar" class="content-view">
+                <div class="calendar-wrapper">
+                    <div class="calendar-header">
+                        <div class="cal-controls">
+                            <button class="btn btn-secondary btn-icon" id="cal-prev-btn"><i
+                                    class="fa-solid fa-chevron-left"></i></button>
+                            <h2 id="calendar-month-year">Calendar</h2>
+                            <button class="btn btn-secondary btn-icon" id="cal-next-btn"><i
+                                    class="fa-solid fa-chevron-right"></i></button>
+                            <button class="btn btn-secondary" id="cal-today-btn">Today</button>
+                        </div>
+                        <div class="cal-legend">
+                            <span class="legend-item"><span class="legend-dot exam"></span> Exam</span>
+                            <span class="legend-item"><span class="legend-dot task"></span> Task</span>
+                            <span class="legend-item"><span class="legend-dot schedule"></span> Schedule</span>
+                            <span class="legend-item"><span class="legend-dot note"></span> Note</span>
+                            <span class="legend-item"><span class="legend-dot goal"></span> Goal</span>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid-header">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+
+                    <div class="calendar-grid" id="calendar-days-grid"></div>
+                </div>
+            </section>
+
+            <section id="view-tasks" class="content-view">
+                <div class="tasks-page-layout">
+                    <div class="tasks-toolbar">
+                        <div class="task-filters">
+                            <button class="filter-chip active" data-filter="all">All Tasks</button>
+                            <button class="filter-chip" data-filter="exam">Exams <span class="chip-count"
+                                    id="count-exam">0</span></button>
+                            <button class="filter-chip" data-filter="task">Tasks <span class="chip-count"
+                                    id="count-task">0</span></button>
+                            <button class="filter-chip" data-filter="schedule">Schedules <span class="chip-count"
+                                    id="count-schedule">0</span></button>
+                            <button class="filter-chip" data-filter="completed">Completed <span class="chip-count"
+                                    id="count-completed">0</span></button>
+                        </div>
+
+                        <div class="task-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="task-search-input" placeholder="Search tasks...">
+                        </div>
+                    </div>
+
+                    <div class="tasks-full-container" id="tasks-full-list"></div>
+                </div>
+            </section>
+
+            <section id="view-goals" class="content-view">
+                <div class="goals-page-layout">
+                    <div class="goals-hero">
+                        <div class="goals-hero-card">
+                            <div class="trophy-icon"><i class="fa-solid fa-trophy"></i></div>
+                            <div class="hero-goals-info">
+                                <h2>Achievement Wall</h2>
+                                <p>Track long term goals, active streaks, and celebrate milestones.</p>
+                            </div>
+                            <button class="btn btn-gradient" id="add-new-goal-btn">
+                                <i class="fa-solid fa-plus"></i> New Goal
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="goals-grid" id="goals-main-grid"></div>
+
+                    <div class="completed-archive-section">
+                        <h3><i class="fa-solid fa-circle-check"></i> Completed Tasks History</h3>
+                        <div class="completed-log-list" id="completed-log-container"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-notes" class="content-view">
+                <div class="journal-layout">
+                    <div class="journal-sidebar">
+                        <div class="journal-header">
+                            <h3>Saved Diary Entries</h3>
+                            <button class="btn btn-secondary btn-sm" id="new-journal-entry-btn"><i
+                                    class="fa-solid fa-plus"></i> Today</button>
+                        </div>
+                        <div class="journal-dates-list" id="journal-dates-container"></div>
+                    </div>
+
+                    <div class="journal-editor-card">
+                        <div class="editor-header">
+                            <div class="editor-date-info">
+                                <i class="fa-solid fa-calendar-day"></i>
+                                <h3 id="journal-selected-date-title">Diary Entry</h3>
+                            </div>
+                            <div class="editor-tags">
+                                <label>Mood:</label>
+                                <select id="journal-mood-select">
+                                    <option value="😃 Energetic">😃 Energetic</option>
+                                    <option value="🎯 Focused" selected>🎯 Focused</option>
+                                    <option value="📚 Productive">📚 Productive</option>
+                                    <option value="☕ Relaxed">☕ Relaxed</option>
+                                    <option value="😴 Tired">😴 Tired</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <textarea id="journal-content-textarea"
+                            placeholder="Write key takeaways, study summaries, exam notes, or daily reflections..."></textarea>
+
+                        <div class="editor-footer">
+                            <span id="journal-save-msg" class="text-muted">Auto-saves as you type...</span>
+                            <button class="btn btn-primary" id="save-journal-btn"><i
+                                    class="fa-solid fa-floppy-disk"></i> Save Entry</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Input Assistant Bar (Bottom of Main Content) -->
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="dify-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-robot color-primary"></i>
+                    <h3>Dify.ai Integration Settings</h3>
+                </div>
+                <button class="modal-close-btn" id="close-dify-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-intro">Configure your Dify.ai API key to parse natural language requests.</p>
+
+                <div class="form-group">
+                    <label for="dify-api-key">Dify API Key <span class="req">*</span></label>
+                    <input type="password" id="dify-api-key" placeholder="app-xxxxxxxxxxxxxxxxxxxxxxxx"
+                        class="form-control">
+                    <small class="form-help">Auto-loaded from <code>.env</code> file or entered here.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="dify-base-url">API Base URL</label>
+                    <input type="text" id="dify-base-url" value="https://api.dify.ai/v1"
+                        placeholder="https://api.dify.ai/v1" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="dify-mode-select">Execution Mode</label>
+                    <select id="dify-mode-select" class="form-control">
+                        <option value="auto" selected>Auto (Use Dify API if key exists, fallback to local parser)
+                        </option>
+                        <option value="dify">Dify API Only</option>
+                        <option value="local">Local Parser Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="test-dify-btn"><i class="fa-solid fa-plug"></i> Test
+                    Connection</button>
+                <button class="btn btn-primary" id="save-dify-btn"><i class="fa-solid fa-check"></i> Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="event-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-calendar-plus color-accent"></i>
+                    <h3 id="event-modal-heading">Add Item</h3>
+                </div>
+                <button class="modal-close-btn" id="close-event-modal-btn">&times;</button>
+            </div>
+            <form id="manual-event-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="event-title">Title <span class="req">*</span></label>
+                        <input type="text" id="event-title" placeholder="e.g. Physics Midterm Exam" class="form-control"
+                            required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="event-type">Category</label>
+                            <select id="event-type" class="form-control">
+                                <option value="exam">🎓 Exam</option>
+                                <option value="task" selected>📌 Task / To-Do</option>
+                                <option value="schedule">📅 Schedule / Class</option>
+                                <option value="note">📝 Note</option>
+                                <option value="goal">🎯 Goal</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="event-priority">Priority</label>
+                            <select id="event-priority" class="form-control">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="event-date">Date <span class="req">*</span></label>
+                            <input type="date" id="event-date" class="form-control" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="event-time">Time</label>
+                            <input type="time" id="event-time" class="form-control" value="09:00">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-notes">Notes</label>
+                        <textarea id="event-notes" placeholder="Additional details..." class="form-control"
+                            rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-event-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="goal-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-trophy color-warning"></i>
+                    <h3>New Goal</h3>
+                </div>
+                <button class="modal-close-btn" id="close-goal-modal-btn">&times;</button>
+            </div>
+            <form id="new-goal-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="goal-title">Goal Title <span class="req">*</span></label>
+                        <input type="text" id="goal-title" placeholder="e.g. Master React & Node.js"
+                            class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-6">
+                            <label for="goal-target">Target Count</label>
+                            <input type="number" id="goal-target" value="10" min="1" class="form-control">
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="goal-category">Category</label>
+                            <select id="goal-category" class="form-control">
+                                <option value="Study">📚 Study</option>
+                                <option value="Fitness">🏋️ Fitness</option>
+                                <option value="Personal">🌟 Personal</option>
+                                <option value="Project">💻 Coding</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="goal-deadline">Deadline</label>
+                        <input type="date" id="goal-deadline" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-goal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="script.js"></script>
+</body>
+
+</html>
