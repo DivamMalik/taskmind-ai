@@ -691,6 +691,8 @@ class NoteManager {
     constructor(appState) {
         this.appState = appState;
         this.selectedDate = SmartParser.formatDateString(new Date());
+        this.quickNoteInitialized = false;
+        this.journalListenersInitialized = false;
     }
 
     initQuickNoteWidget() {
@@ -700,20 +702,50 @@ class NoteManager {
 
         const todayStr = SmartParser.formatDateString(new Date());
         const existingNote = this.appState.notes[todayStr] || { content: '', mood: '🎯 Focused' };
-        textarea.value = existingNote.content;
+        if (document.activeElement !== textarea) {
+            textarea.value = existingNote.content || '';
+        }
 
-        let autoSaveTimer;
-        textarea.addEventListener('input', () => {
-            if (tag) tag.textContent = 'Saving...';
-            clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(() => {
-                this.saveJournalEntry(todayStr, textarea.value, existingNote.mood);
-                if (tag) tag.textContent = 'Saved';
-            }, 800);
+        if (!this.quickNoteInitialized) {
+            this.quickNoteInitialized = true;
+            let autoSaveTimer;
+            textarea.addEventListener('input', () => {
+                if (tag) tag.textContent = 'Saving...';
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(() => {
+                    this.saveJournalEntry(todayStr, textarea.value, existingNote.mood);
+                    if (tag) tag.textContent = 'Saved';
+                }, 800);
+            });
+        }
+    }
+
+    initJournalListeners() {
+        if (this.journalListenersInitialized) return;
+        this.journalListenersInitialized = true;
+
+        const saveBtn = document.getElementById('save-journal-btn');
+        const newBtn = document.getElementById('new-journal-entry-btn');
+
+        saveBtn?.addEventListener('click', () => {
+            const textarea = document.getElementById('journal-content-textarea');
+            const moodSelect = document.getElementById('journal-mood-select');
+            if (textarea && moodSelect) {
+                this.saveJournalEntry(this.selectedDate, textarea.value, moodSelect.value);
+                if (window.appController) window.appController.showToast(`Diary saved for ${this.selectedDate}`, 'success');
+            }
+        });
+
+        newBtn?.addEventListener('click', () => {
+            const todayStr = SmartParser.formatDateString(new Date());
+            this.selectedDate = todayStr;
+            this.renderFullJournalView();
         });
     }
 
     renderFullJournalView() {
+        this.initJournalListeners();
+
         const datesContainer = document.getElementById('journal-dates-container');
         const textarea = document.getElementById('journal-content-textarea');
         const titleEl = document.getElementById('journal-selected-date-title');
@@ -741,27 +773,23 @@ class NoteManager {
 
         const activeEntry = this.appState.notes[this.selectedDate] || { content: '', mood: '🎯 Focused' };
         if (titleEl) titleEl.textContent = `Diary Entry for ${this.selectedDate}`;
-        textarea.value = activeEntry.content || '';
+        if (document.activeElement !== textarea) {
+            textarea.value = activeEntry.content || '';
+        }
         if (moodSelect) moodSelect.value = activeEntry.mood || '🎯 Focused';
 
+        let journalAutoSaveTimer;
         textarea.oninput = () => {
             const saveMsg = document.getElementById('journal-save-msg');
             if (saveMsg) saveMsg.textContent = 'Saving...';
-            this.saveJournalEntry(this.selectedDate, textarea.value, moodSelect.value);
-            setTimeout(() => { if (saveMsg) saveMsg.textContent = 'Saved'; }, 600);
+            clearTimeout(journalAutoSaveTimer);
+            journalAutoSaveTimer = setTimeout(() => {
+                this.saveJournalEntry(this.selectedDate, textarea.value, moodSelect.value);
+                if (saveMsg) saveMsg.textContent = 'Saved';
+            }, 600);
         };
 
         moodSelect.onchange = () => this.saveJournalEntry(this.selectedDate, textarea.value, moodSelect.value);
-
-        document.getElementById('save-journal-btn')?.addEventListener('click', () => {
-            this.saveJournalEntry(this.selectedDate, textarea.value, moodSelect.value);
-            if (window.appController) window.appController.showToast(`Diary saved for ${this.selectedDate}`, 'success');
-        });
-
-        document.getElementById('new-journal-entry-btn')?.addEventListener('click', () => {
-            this.selectedDate = todayStr;
-            this.renderFullJournalView();
-        });
     }
 
     saveJournalEntry(dateStr, content, mood) {
@@ -1084,6 +1112,17 @@ class AppController {
     showToast(message, type = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
+
+        const existingSpans = container.querySelectorAll('.toast span');
+        for (let span of existingSpans) {
+            if (span.textContent === message) {
+                return;
+            }
+        }
+
+        while (container.children.length >= 3) {
+            container.removeChild(container.firstChild);
+        }
 
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
